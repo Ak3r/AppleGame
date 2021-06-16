@@ -1,89 +1,103 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './App.css';
 
 import Button from './components/Button';
 import UserField from './components/UserField';
 import MachineField from './components/MachineField';
 
-function App() {
-  const [apples, setApples] = useState(['🍎','🍎','🍎','🍎','🍎',
-                                        '🍎','🍎','🍎','🍎','🍎',
-                                        '🍎','🍎','🍎','🍎','🍎',
-                                        '🍎','🍎','🍎','🍎','🍎',
-                                        '🍎','🍎','🍎','🍎','🍎']);
+class App extends React.Component {
+    constructor(props) {
+        super(props);
 
-  const [userScore, setUserScore] = useState(0);
-  const [myApplesArray, setMyApplesArray] = useState([]);
+        this.state = {
+            apples: ['🍎','🍎','🍎','🍎','🍎',
+                     '🍎','🍎','🍎','🍎','🍎',
+                     '🍎','🍎','🍎','🍎','🍎',
+                     '🍎','🍎','🍎','🍎','🍎',
+                     '🍎','🍎','🍎','🍎','🍎'], 
+            userScore: 0,
+            userArray: [],
+            machineScore: 0,
+            machineArray: [], 
+            disabled: false  
+        };
+    }
 
-  const [machineScore, setMachineScore] = useState(0);
-  const [machineApplesArray, setMachineApplesArray] = useState([]);
+  handleClick = (n) => {
+    this.removeFromApplesArray(n); // меняем общий массив яблок
+    this.setState({userScore: this.state.userScore + n}); // меняем счёт пользователя
+    this.changeUserScoreArray(n, this.state.userArray); // меням массив с яблоками пользователя
 
-  const handleClick = (n) => {
-    setUserScore(userScore + n); // меняем счёт пользователя
-    // -----------------------------------------------
-    setUserScore((userScore) => {
-      console.log(userScore); // "React is awesome!"
-      
-      return userScore;
-    });
-    // -----------------------------------------------
-    changeScoreArray(n, myApplesArray, setMyApplesArray); // меням массив с яблоками пользователя
-
-    setTimeout(machineTurn, 1000); // ход ИИ
+    setTimeout(this.machineTurn, 300); // ход ИИ
   }  
 
-  const machineTurn = () => {
+  machineTurn = () => {
     for ( let i = 1; i <= 3; i++) { // i - кол-во яблок которое возьмет ИИ
         let leftApples; // кол-во яблок которое останется после того как ИИ сделает ход
-        leftApples = apples.length - i; 
+        leftApples = this.state.apples.length - i; 
 
         // если оставшееся число яблок, сравнимое с 0 или 1 по модулю 4, то значение i единственно правильный выбор
         if ( leftApples % 4 === 0 || leftApples % 4 === 1 ) {
-          setMachineScore(machineScore + i); // меняем счёт машины
-          // -----------------------------------------------
-          setMachineScore((machineScore) => {
-            console.log(machineScore); 
-            
-            return machineScore;
-          });
-          // -----------------------------------------------
-          changeScoreArray(i, machineApplesArray, setMachineApplesArray); // меням массив с яблоками ИИ
+          this.removeFromApplesArray(i); // меняем общий массив яблок
+          this.setState({machineScore: this.state.machineScore + i}); // меняем счёт машины
+          this.changeMachineScoreArray(i, this.state.machineArray); // меням массив с яблоками ИИ
         }
-        console.log(machineScore+userScore)
-        removeFromApplesArray((machineScore+userScore))
+    }
+
+    if(this.state.apples.length === 2 || this.state.apples.length === 1) {
+      this.setState({
+        disabled: true
+      })
+    }
+
+    if(this.state.apples.length === 0) {
+        return this.state.userScore % 2 === 0 ? alert('User win!') : alert('Machine win!');
     }
   }
 
-  const changeScoreArray = (n, arr, setArr) => {
-    let localArr = [...arr]; // копируем массив наших яблок
+  // меняем массив с яблоками пользователя
+  changeUserScoreArray = (n, arr) => {
+    let localArr = [...arr]; 
     for (let i = 0; i < n; i++) {
-      localArr.push('🍎'); // добавляем яблоки
+      localArr.push('🍎'); 
     }
-    setArr([...localArr]); // меняем state 
+    this.setState({userArray: [...localArr]}); 
   }  
 
-  const removeFromApplesArray = (n) => {
-    let arr = [...apples]; // копируем массив всех яблок
-    arr.splice(0,n); // убираем яблоки
-    setApples([...arr]); // меняем state 
+  // меняем массив с яблоками ИИ
+  changeMachineScoreArray = (n, arr) => {
+    let localArr = [...arr]; 
+    for (let i = 0; i < n; i++) {
+      localArr.push('🍎'); 
+    }
+    this.setState({machineArray: [...localArr]});
+  }  
+
+  // меняем общий массив яблок
+  removeFromApplesArray = (n) => {
+    let arr = [...this.state.apples]; 
+    arr.splice(0,n); 
+    this.setState({apples: [...arr]}); 
   }
 
-  return (
-    <div className="App">
-      <h1>Get even number of apples!</h1>
-      <p>{apples.join(", ")}</p>
-      <p>Number of apples: {apples.length}</p>
-      <div className='buttons-block'>
-        <Button color='red' value={1} handleClick={() => handleClick(1)}/>
-        <Button color='green' value={2} handleClick={() => handleClick(2)}/>
-        <Button color='blue' value={3} handleClick={() => handleClick(3)}/>
-      </div>
-      <div className='score-field'>
-        <MachineField machineScore={machineScore} machineApplesArray={machineApplesArray}/>
-        <UserField userScore={userScore} myApplesArray={myApplesArray}/>
-      </div>
-    </div>
-  );
+  render() {
+    return (
+        <div className="App">
+          <h1>Get even number of apples!</h1>
+          <p>{this.state.apples.join(", ")}</p>
+          <p>Number of apples: {this.state.apples.length}</p>
+          <div className='buttons-block'>
+            <Button color='red' value={1} handleClick={() => this.handleClick(1)}/>
+            <Button color='green' value={2} handleClick={() => this.handleClick(2)} disabled={this.state.disabled}/>
+            <Button color='blue' value={3} handleClick={() => this.handleClick(3)} disabled={this.state.disabled}/>
+          </div>
+          <div className='score-field'>
+            <MachineField machineScore={this.state.machineScore} machineArray={this.state.machineArray}/>
+            <UserField userScore={this.state.userScore} userArray={this.state.userArray}/>
+          </div>
+        </div>
+      );
+  }
 }
 
 export default App;
