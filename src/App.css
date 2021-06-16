@@ -1,0 +1,26 @@
+.App {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* justify-content: center; */
+  font-size: calc(10px + 2vmin);
+  color: white;
+  padding: 10vmin;
+}
+
+.buttons-block {
+  display: flex;
+  flex-direction: row;
+  min-width: 50vmin;
+  justify-content: space-between;
+}
+
+.score-field {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  min-width: 100%;
+  margin-top: 10vmin;
+}
