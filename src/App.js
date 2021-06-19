@@ -19,12 +19,15 @@ class App extends React.Component {
             userArray: [],
             machineScore: 0,
             machineArray: [], 
-            disabled: false  
+            disabled: false
         };
     }
 
   handleClick = (n) => {
     this.removeFromApplesArray(n); // меняем общий массив яблок
+    if (this.state.apples.length === 0) {
+      n = 0;
+    }
     this.setState({userScore: this.state.userScore + n}); // меняем счёт пользователя
     this.changeUserScoreArray(n, this.state.userArray); // меням массив с яблоками пользователя
 
@@ -44,14 +47,16 @@ class App extends React.Component {
         }
     }
 
-    if(this.state.apples.length === 2 || this.state.apples.length === 1) {
+    if(this.state.apples.length === 2 || this.state.apples.length === 1 || this.state.apples.length === 0) {
       this.setState({
         disabled: true
       })
     }
 
     if(this.state.apples.length === 0) {
-        return this.state.userScore % 2 === 0 ? alert('User win!') : alert('Machine win!');
+        this.state.userScore % 2 === 0 ? 
+          alert('You Win! Great job!') : 
+          alert('Maybe next time...');
     }
   }
 
